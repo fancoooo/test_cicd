@@ -1,0 +1,25 @@
+# ArgoCD Application: dinh nghia GitOps - ArgoCD theo doi thu muc k8s/
+# trong repo Git va tu dong dong bo len cluster (icon Argo trong anh).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cicd-demo
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/your-username/springboot-cicd-demo.git
+    targetRevision: main
+    path: k8s          # ArgoCD apply tat ca manifest trong thu muc nay
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cicd-demo
+
+  syncPolicy:
+    automated:
+      prune: true       # xoa resource khong con trong Git
+      selfHeal: true    # tu sua neu cluster bi drift khoi Git
+    syncOptions:
+      - CreateNamespace=true

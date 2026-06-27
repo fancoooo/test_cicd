@@ -1,0 +1,17 @@
+# Dung khi cai Prometheus qua kube-prometheus-stack (Prometheus Operator).
+# ServiceMonitor bao cho Prometheus biet scrape metrics tu service nao.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cicd-demo
+  namespace: cicd-demo
+  labels:
+    release: kube-prometheus-stack   # phai khop label ma Prometheus Operator chon
+spec:
+  selector:
+    matchLabels:
+      app: cicd-demo
+  endpoints:
+    - port: "80"
+      path: /actuator/prometheus
+      interval: 15s

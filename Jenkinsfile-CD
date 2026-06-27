@@ -1,0 +1,82 @@
+// =====================================================================
+//  JENKINS CD JOB  -  Khop voi nua duoi cua so do CICD.png
+//  Update Docker image version -> push GitHub (manifest repo)
+//  -> ArgoCD tu dong pull & deploy len Kubernetes
+//
+//  Day la mo hinh GitOps: Jenkins KHONG kubectl apply truc tiep.
+//  Jenkins chi sua tag image trong file k8s/deployment.yaml roi git push.
+//  ArgoCD theo doi repo va dong bo trang thai len cluster.
+// =====================================================================
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Tag image moi tu CI job')
+    }
+
+    environment {
+        IMAGE_NAME  = 'your-dockerhub-username/cicd-demo'
+        GIT_CRED    = 'github-cred'   // Jenkins credentials ID (token GitHub)
+        MANIFEST_REPO = 'github.com/your-username/springboot-cicd-demo.git'
+    }
+
+    stages {
+
+        // ---- Pull code (repo chua manifest k8s) ----
+        stage('Pull Manifest Repo') {
+            steps {
+                git branch: 'main', url: "https://${MANIFEST_REPO}"
+            }
+        }
+
+        // ---- Update Docker Image Version trong deployment.yaml ----
+        stage('Update Image Tag') {
+            steps {
+                sh '''
+                    sed -i "s|image: .*cicd-demo:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g" k8s/deployment.yaml
+                    echo "==> deployment.yaml sau khi cap nhat:"
+                    grep "image:" k8s/deployment.yaml
+                '''
+            }
+        }
+
+        // ---- Push GitHub: commit thay doi (mui ten toi icon GitHub) ----
+        stage('Commit & Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: "${GIT_CRED}",
+                        usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                    sh '''
+                        git config user.email "ci@jenkins.local"
+                        git config user.name  "jenkins-cd"
+                        git add k8s/deployment.yaml
+                        git commit -m "chore: update image to ${IMAGE_TAG} [ci skip]" || echo "Khong co thay doi"
+                        git push https://${GIT_USER}:${GIT_TOKEN}@${MANIFEST_REPO} HEAD:main
+                    '''
+                }
+            }
+        }
+
+        // ---- (Tuy chon) Ep ArgoCD sync ngay thay vi cho auto-sync ----
+        stage('ArgoCD Sync (optional)') {
+            steps {
+                sh '''
+                    # Can cai argocd CLI + login truoc; neu da bat auto-sync thi bo qua stage nay
+                    argocd app sync cicd-demo || echo "Bo qua: ArgoCD se tu dong dong bo"
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            emailext subject: "CD OK: deploy ${IMAGE_TAG}",
+                     body: "Da cap nhat manifest va trigger ArgoCD deploy len K8s.",
+                     to: 'vietxuyen97@gmail.com'
+        }
+        failure {
+            emailext subject: "CD FAILED #${env.BUILD_NUMBER}",
+                     body: "Xem: ${env.BUILD_URL}",
+                     to: 'vietxuyen97@gmail.com'
+        }
+    }
+}
