@@ -23,7 +23,7 @@ spec:
       containers:
         - name: cicd-demo
           # Dong nay se duoc Jenkins CD job (sed) cap nhat moi lan deploy
-          image: vietng1997/cicd-demo:latest
+          image: vietng1997/cicd-demo:11
           ports:
             - containerPort: 8088
           resources:
