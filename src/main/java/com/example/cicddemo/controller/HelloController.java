@@ -12,7 +12,7 @@ public class HelloController {
     public Map<String, String> home() {
         return Map.of(
                 "message", "Hello from Spring Boot CI/CD demo!",
-                "version", "1.0.0"
+                "version", "1.1.0"
         );
     }
 
