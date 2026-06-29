@@ -20,7 +20,7 @@ class HelloControllerTest {
     void home_returnsMessage() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.version").value("1.0.0"));
+                .andExpect(jsonPath("$.version").value("1.1.0"));
     }
 
     @Test
