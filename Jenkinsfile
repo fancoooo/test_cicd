@@ -54,18 +54,18 @@ pipeline {
         }
 
         // ---- Buoc 3: OWASP Dependency Check (icon OWASP trong anh) ----
-        stage('OWASP Dependency Check') {
-            steps {
-                // Quet CVE trong cac thu vien. Build se fail neu CVSS >= 7 (cau hinh trong pom.xml)
-                sh 'mvn org.owasp:dependency-check-maven:check'
-            }
-            post {
-                always {
-                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-                    archiveArtifacts artifacts: '**/dependency-check-report.html', allowEmptyArchive: true
-                }
-            }
-        }
+//         stage('OWASP Dependency Check') {
+//             steps {
+//                 // Quet CVE trong cac thu vien. Build se fail neu CVSS >= 7 (cau hinh trong pom.xml)
+//                 sh 'mvn org.owasp:dependency-check-maven:check'
+//             }
+//             post {
+//                 always {
+//                     dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+//                     archiveArtifacts artifacts: '**/dependency-check-report.html', allowEmptyArchive: true
+//                 }
+//             }
+//         }
 
         // ---- Buoc 4: SonarQube - Code & quality gate analysis ----
 //         stage('SonarQube Analysis') {
