@@ -22,10 +22,10 @@ USER app
 
 COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 8088
 
 # Healthcheck dung endpoint actuator
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
-  CMD wget -qO- http://localhost:8080/actuator/health || exit 1
+  CMD wget -qO- http://localhost:8088/actuator/health || exit 1
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

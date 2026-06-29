@@ -30,7 +30,7 @@ Dự án Spring Boot này tái hiện **đúng từng bước** trong sơ đồ 
 | Update image version | Jenkins CD | `Jenkinsfile-CD` (`sed` sửa `k8s/deployment.yaml`) |
 | Pull code & deploy K8s | ArgoCD | `argocd/application.yaml` |
 | Chạy ứng dụng | Kubernetes | `k8s/deployment.yaml`, `service.yaml`, `namespace.yaml` |
-| Monitoring | Prometheus + Grafana | `monitoring/prometheus.yml`, `k8s/servicemonitor.yaml`, Actuator trong `application.yml` |
+| Monitoring | Prometheus (thuần) + Grafana | `monitoring/prometheus.yaml`, annotation trong `k8s/deployment.yaml`, Actuator trong `application.yml` |
 | Notify on email | Gmail/SMTP | khối `post { }` trong `Jenkinsfile` (`emailext`) |
 
 ---
@@ -50,10 +50,10 @@ mvn spring-boot:run       # chạy app
 ```
 
 Mở thử:
-- http://localhost:8080/ → trả JSON `message/version`
-- http://localhost:8080/api/greet
-- http://localhost:8080/actuator/health → `{"status":"UP"}`
-- http://localhost:8080/actuator/prometheus → metrics dạng text (Prometheus đọc cái này)
+- http://localhost:8088/ → trả JSON `message/version`
+- http://localhost:8088/api/greet
+- http://localhost:8088/actuator/health → `{"status":"UP"}`
+- http://localhost:8088/actuator/prometheus → metrics dạng text (Prometheus đọc cái này)
 
 Báo cáo coverage: `target/site/jacoco/index.html`.
 
@@ -63,7 +63,7 @@ Cần: Docker.
 
 ```bash
 docker build -t cicd-demo:local .
-docker run -p 8080:8080 cicd-demo:local
+docker run -p 8088:8088 cicd-demo:local
 ```
 
 `Dockerfile` dùng **multi-stage**: stage build dùng Maven, stage runtime chỉ chứa JRE alpine + chạy bằng user non-root → image nhỏ, an toàn hơn (chính là image mà Trivy sẽ quét).
@@ -79,8 +79,8 @@ docker compose -f docker-compose.tools.yml up -d
 Mở:
 - Jenkins: http://localhost:8081 (lấy mật khẩu: `docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword`)
 - SonarQube: http://localhost:9000 (admin/admin)
-- Prometheus: http://localhost:9090
-- Grafana: http://localhost:3000 (admin/admin)
+
+> Compose này **không** còn Prometheus/Grafana, vì app deploy lên K8s thì monitoring phải chạy trong cluster (xem Cấp 4).
 
 Trong Jenkins, cài plugin: *Pipeline, Git, Docker Pipeline, SonarQube Scanner, OWASP Dependency-Check, Email Extension, Eclipse Temurin installer*.
 
@@ -133,7 +133,26 @@ Cần: 1 cluster K8s (minikube / kind / k3s đều được) + ArgoCD.
 2. Sửa `repoURL` trong `argocd/application.yaml` thành repo của bạn, rồi `kubectl apply -f argocd/application.yaml`.
 3. Tạo job Jenkins CD tên `cicd-demo-CD` trỏ vào `Jenkinsfile-CD`. CI job sẽ tự trigger nó.
 4. Luồng hoàn chỉnh: CI build image tag mới → CD `sed` đổi tag trong `k8s/deployment.yaml` → push Git → ArgoCD phát hiện thay đổi → deploy lên K8s.
-5. Monitoring: cài `kube-prometheus-stack` qua Helm, apply `k8s/servicemonitor.yaml`. Grafana import dashboard **JVM (Micrometer) id 4701** hoặc **Spring Boot 2.1 id 11378** để xem metrics.
+
+#### Monitoring: Prometheus thuần + Grafana sẵn có
+
+Cluster của bạn đã có **Grafana** trong namespace `monitoring` nhưng **chưa có Prometheus** và không có Prometheus Operator. Nên ta deploy **Prometheus thuần** bằng manifest, scrape pod qua annotation (không cần Helm).
+
+```bash
+# 1. Deploy Prometheus vao namespace monitoring
+kubectl apply -f monitoring/prometheus.yaml
+kubectl get pods -n monitoring          # cho prometheus-... Running
+
+# 2. Kiem tra Prometheus thay target app chua
+kubectl -n monitoring port-forward svc/prometheus 19090:9090
+#   -> http://localhost:19090/targets : pod cicd-demo phai o trang thai UP
+```
+
+Nối Grafana (sẵn có) với Prometheus: **Connections → Data sources → Add → Prometheus**, URL `http://prometheus.monitoring.svc.cluster.local:9090`. Rồi **Dashboards → Import** ID **4701** (JVM Micrometer) và **11378** (Spring Boot).
+
+Cách hoạt động: app expose `/actuator/prometheus` → Prometheus đọc annotation `prometheus.io/scrape` trên pod (đã đặt trong `k8s/deployment.yaml`) để tự tìm và scrape → Grafana vẽ dashboard. Chi tiết ở `monitoring/README.md`.
+
+> `monitoring/prometheus.yaml` apply **thủ công** (hạ tầng dùng chung), không nằm trong `k8s/` mà ArgoCD quản lý.
 
 ---
 

@@ -10,6 +10,7 @@ spec:
   selector:
     app: cicd-demo
   ports:
-    - port: 80
-      targetPort: 8080
+    - name: http          # ServiceMonitor tham chieu port theo TEN nay
+      port: 80
+      targetPort: 8088
       protocol: TCP

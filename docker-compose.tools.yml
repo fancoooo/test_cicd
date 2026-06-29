@@ -1,7 +1,11 @@
 # =====================================================================
 #  Stack cong cu CI/CD chay LOCAL de hoc tap (khong dung cho production).
-#  Gom: Jenkins, SonarQube (+ Postgres), Prometheus, Grafana.
+#  Gom: Jenkins, SonarQube (+ Postgres).
 #  Chay:  docker compose -f docker-compose.tools.yml up -d
+#
+#  LUU Y: Prometheus + Grafana KHONG dat o day nua. Vi app deploy len
+#  Kubernetes, monitoring duoc cai TRONG cluster bang kube-prometheus-stack
+#  (Helm). Xem Cap 4 trong HUONG_DAN.md.
 # =====================================================================
 services:
 
@@ -17,51 +21,34 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock   # cho Jenkins build Docker
     restart: unless-stopped
 
-  sonarqube:
-    image: sonarqube:community
-    container_name: sonarqube
-    depends_on: [sonar-db]
-    ports:
-      - "9000:9000"      # UI SonarQube: http://localhost:9000 (admin/admin)
-    environment:
-      SONAR_JDBC_URL: jdbc:postgresql://sonar-db:5432/sonar
-      SONAR_JDBC_USERNAME: sonar
-      SONAR_JDBC_PASSWORD: sonar
-    volumes:
-      - sonar_data:/opt/sonarqube/data
-      - sonar_ext:/opt/sonarqube/extensions
-    restart: unless-stopped
-
-  sonar-db:
-    image: postgres:15
-    container_name: sonar-db
-    environment:
-      POSTGRES_USER: sonar
-      POSTGRES_PASSWORD: sonar
-      POSTGRES_DB: sonar
-    volumes:
-      - sonar_pg:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    ports:
-      - "9090:9090"      # UI Prometheus: http://localhost:9090
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-    restart: unless-stopped
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    ports:
-      - "3000:3000"      # UI Grafana: http://localhost:3000 (admin/admin)
-    depends_on: [prometheus]
-    restart: unless-stopped
+#  sonarqube:
+#    image: sonarqube:community
+#    container_name: sonarqube
+#    depends_on: [sonar-db]
+#    ports:
+#      - "9000:9000"      # UI SonarQube: http://localhost:9000 (admin/admin)
+#    environment:
+#      SONAR_JDBC_URL: jdbc:postgresql://sonar-db:5432/sonar
+#      SONAR_JDBC_USERNAME: sonar
+#      SONAR_JDBC_PASSWORD: sonar
+#    volumes:
+#      - sonar_data:/opt/sonarqube/data
+#      - sonar_ext:/opt/sonarqube/extensions
+#    restart: unless-stopped
+#
+#  sonar-db:
+#    image: postgres:15
+#    container_name: sonar-db
+#    environment:
+#      POSTGRES_USER: sonar
+#      POSTGRES_PASSWORD: sonar
+#      POSTGRES_DB: sonar
+#    volumes:
+#      - sonar_pg:/var/lib/postgresql/data
+#    restart: unless-stopped
 
 volumes:
   jenkins_home:
-  sonar_data:
-  sonar_ext:
-  sonar_pg:
+#  sonar_data:
+#  sonar_ext:
+#  sonar_pg:

@@ -9,8 +9,8 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/your-username/springboot-cicd-demo.git
-    targetRevision: main
+    repoURL: https://github.com/fancoooo/test_cicd.git
+    targetRevision: master
     path: k8s          # ArgoCD apply tat ca manifest trong thu muc nay
 
   destination:

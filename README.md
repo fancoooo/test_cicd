@@ -14,7 +14,7 @@ mvn spring-boot:run          # chạy app local
 docker build -t cicd-demo .  # đóng gói
 ```
 
-App: http://localhost:8080 · Health: `/actuator/health` · Metrics: `/actuator/prometheus`
+App: http://localhost:8088 · Health: `/actuator/health` · Metrics: `/actuator/prometheus`
 
 ## Cấu trúc
 
@@ -24,8 +24,8 @@ App: http://localhost:8080 · Health: `/actuator/health` · Metrics: `/actuator/
 ├── Jenkinsfile                # CI job (nửa trên sơ đồ)
 ├── Jenkinsfile-CD             # CD job GitOps (nửa dưới sơ đồ)
 ├── sonar-project.properties   # cấu hình SonarQube
-├── k8s/                       # manifests Kubernetes + ServiceMonitor
+├── k8s/                       # manifests Kubernetes (app, deploy bởi ArgoCD)
 ├── argocd/application.yaml    # ArgoCD Application (GitOps)
-├── monitoring/prometheus.yml  # cấu hình Prometheus
-└── docker-compose.tools.yml   # Jenkins + SonarQube + Prometheus + Grafana local
+├── monitoring/prometheus.yaml # Prometheus thuần (apply thủ công vào ns monitoring)
+└── docker-compose.tools.yml   # Jenkins + SonarQube local
 ```

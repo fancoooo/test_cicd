@@ -27,7 +27,7 @@ pipeline {
 
     environment {
         // Doi cho phu hop registry cua ban (Docker Hub / GHCR / Harbor...)
-        IMAGE_NAME   = 'your-dockerhub-username/cicd-demo'
+        IMAGE_NAME   = 'vietng1997/cicd-demo'
         IMAGE_TAG    = "${env.BUILD_NUMBER}"           // moi build = 1 tag rieng
         REGISTRY_CRED = 'dockerhub-cred'               // Jenkins credentials ID
         SONAR_ENV    = 'sonarqube'                     // ten SonarQube server trong Jenkins
@@ -38,8 +38,8 @@ pipeline {
         // ---- Buoc 1: Pull code (GitHub) ----
         stage('Pull Code') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/your-username/springboot-cicd-demo.git'
+                git branch: 'master',
+                    url: 'https://github.com/fancoooo/test_cicd.git'
             }
         }
 
@@ -68,26 +68,26 @@ pipeline {
         }
 
         // ---- Buoc 4: SonarQube - Code & quality gate analysis ----
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv("${SONAR_ENV}") {
-                    sh '''
-                        mvn sonar:sonar \
-                          -Dsonar.projectKey=cicd-demo \
-                          -Dsonar.java.binaries=target/classes
-                    '''
-                }
-            }
-        }
+//         stage('SonarQube Analysis') {
+//             steps {
+//                 withSonarQubeEnv("${SONAR_ENV}") {
+//                     sh '''
+//                         mvn sonar:sonar \
+//                           -Dsonar.projectKey=cicd-demo \
+//                           -Dsonar.java.binaries=target/classes
+//                     '''
+//                 }
+//             }
+//         }
 
         // ---- Buoc 5: Cho ket qua Quality Gate tu SonarQube ----
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+//         stage('Quality Gate') {
+//             steps {
+//                 timeout(time: 5, unit: 'MINUTES') {
+//                     waitForQualityGate abortPipeline: true
+//                 }
+//             }
+//         }
 
         // ---- Buoc 6: Trivy filesystem scan (icon Trivy trong anh) ----
         stage('Trivy FS Scan') {

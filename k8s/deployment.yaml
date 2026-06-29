@@ -17,7 +17,7 @@ spec:
       annotations:
         # Cho Prometheus tu dong scrape metrics tu pod
         prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
+        prometheus.io/port: "8088"
         prometheus.io/path: "/actuator/prometheus"
     spec:
       containers:
@@ -25,7 +25,7 @@ spec:
           # Dong nay se duoc Jenkins CD job (sed) cap nhat moi lan deploy
           image: your-dockerhub-username/cicd-demo:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 8088
           resources:
             requests:
               cpu: "100m"
@@ -37,12 +37,12 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8080
+              port: 8088
             initialDelaySeconds: 40
             periodSeconds: 15
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: 8080
+              port: 8088
             initialDelaySeconds: 30
             periodSeconds: 10

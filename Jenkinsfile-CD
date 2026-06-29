@@ -15,9 +15,9 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME  = 'your-dockerhub-username/cicd-demo'
+        IMAGE_NAME  = 'vietng1997/cicd-demo'
         GIT_CRED    = 'github-cred'   // Jenkins credentials ID (token GitHub)
-        MANIFEST_REPO = 'github.com/your-username/springboot-cicd-demo.git'
+        MANIFEST_REPO = 'https://github.com/fancoooo/test_cicd.git'
     }
 
     stages {
@@ -57,14 +57,14 @@ pipeline {
         }
 
         // ---- (Tuy chon) Ep ArgoCD sync ngay thay vi cho auto-sync ----
-        stage('ArgoCD Sync (optional)') {
-            steps {
-                sh '''
-                    # Can cai argocd CLI + login truoc; neu da bat auto-sync thi bo qua stage nay
-                    argocd app sync cicd-demo || echo "Bo qua: ArgoCD se tu dong dong bo"
-                '''
-            }
-        }
+        //stage('ArgoCD Sync (optional)') {
+        //    steps {
+        //        sh '''
+        //            # Can cai argocd CLI + login truoc; neu da bat auto-sync thi bo qua stage nay
+        //            argocd app sync cicd-demo || echo "Bo qua: ArgoCD se tu dong dong bo"
+        //        '''
+        //    }
+        //}
     }
 
     post {
