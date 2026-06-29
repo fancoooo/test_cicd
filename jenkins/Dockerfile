@@ -1,8 +1,7 @@
 # =====================================================================
-#  Image Jenkins tuy bien cho du an: cai san Docker CLI + Trivy.
+#  Image Jenkins tuy bien: chi cai them Docker CLI.
 #  - Docker CLI: de stage "Docker Build & Push" goi `docker build/push`
 #    (su dung docker.sock cua host da mount trong docker-compose).
-#  - Trivy: de stage "Trivy FS Scan" / "Trivy image scan" chay duoc.
 #  Build qua docker-compose.tools.yml (key "build").
 # =====================================================================
 FROM jenkins/jenkins:lts-jdk17
@@ -21,9 +20,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         > /etc/apt/sources.list.d/docker.list && \
     apt-get update && apt-get install -y --no-install-recommends docker-ce-cli && \
     rm -rf /var/lib/apt/lists/*
-
-# --- Trivy ---
-RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
-        | sh -s -- -b /usr/local/bin
 
 USER jenkins

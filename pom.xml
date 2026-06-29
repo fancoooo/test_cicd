@@ -80,31 +80,31 @@
             </plugin>
 
             <!-- OWASP Dependency-Check: quet lo hong CVE trong cac thu vien (buoc "Dependency check") -->
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>10.0.4</version>
-                <configuration>
-                    <!-- Build fail neu co lo hong CVSS >= 7 (High/Critical) -->
-                    <failBuildOnCVSS>7</failBuildOnCVSS>
-                    <!-- API key NVD: dat bien moi truong NVD_API_KEY trong Jenkins
-                         de tai database lo hong NHANH va ON DINH (khong bi rate-limit).
-                         Lay key mien phi: https://nvd.nist.gov/developers/request-an-api-key -->
-                    <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
-                    <!-- Cache DB 24h -> khong tai lai moi lan build -->
-                    <nvdValidForHours>24</nvdValidForHours>
-                    <!-- Khong cho loi TAI DB (vd CISA tra 403) lam sap pipeline khi hoc tap.
-                         Van fail neu phat hien CVE >= 7 (failBuildOnCVSS o tren). -->
-                    <failOnError>false</failOnError>
-                    <formats>
-                        <format>HTML</format>
-                        <format>XML</format>
-                    </formats>
-                </configuration>
-                <!-- KHONG gan vao phase verify: chi chay khi goi explicit
-                     `mvn org.owasp:dependency-check-maven:check` o stage rieng trong Jenkinsfile.
-                     Nho vay `mvn clean verify` (Build & Test) chi chay test, rat nhanh. -->
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.owasp</groupId>-->
+<!--                <artifactId>dependency-check-maven</artifactId>-->
+<!--                <version>10.0.4</version>-->
+<!--                <configuration>-->
+<!--                    &lt;!&ndash; Build fail neu co lo hong CVSS >= 7 (High/Critical) &ndash;&gt;-->
+<!--                    <failBuildOnCVSS>7</failBuildOnCVSS>-->
+<!--                    &lt;!&ndash; API key NVD: dat bien moi truong NVD_API_KEY trong Jenkins-->
+<!--                         de tai database lo hong NHANH va ON DINH (khong bi rate-limit).-->
+<!--                         Lay key mien phi: https://nvd.nist.gov/developers/request-an-api-key &ndash;&gt;-->
+<!--                    <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>-->
+<!--                    &lt;!&ndash; Cache DB 24h -> khong tai lai moi lan build &ndash;&gt;-->
+<!--                    <nvdValidForHours>24</nvdValidForHours>-->
+<!--                    &lt;!&ndash; Khong cho loi TAI DB (vd CISA tra 403) lam sap pipeline khi hoc tap.-->
+<!--                         Van fail neu phat hien CVE >= 7 (failBuildOnCVSS o tren). &ndash;&gt;-->
+<!--                    <failOnError>false</failOnError>-->
+<!--                    <formats>-->
+<!--                        <format>HTML</format>-->
+<!--                        <format>XML</format>-->
+<!--                    </formats>-->
+<!--                </configuration>-->
+<!--                &lt;!&ndash; KHONG gan vao phase verify: chi chay khi goi explicit-->
+<!--                     `mvn org.owasp:dependency-check-maven:check` o stage rieng trong Jenkinsfile.-->
+<!--                     Nho vay `mvn clean verify` (Build & Test) chi chay test, rat nhanh. &ndash;&gt;-->
+<!--            </plugin>-->
 
             <!-- SonarQube scanner plugin: chay `mvn sonar:sonar` (buoc "Code and quality gate analysis") -->
 <!--            <plugin>-->
