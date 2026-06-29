@@ -90,15 +90,15 @@ pipeline {
 //         }
 
         // ---- Buoc 6: Trivy filesystem scan (icon Trivy trong anh) ----
-        stage('Trivy FS Scan') {
-            steps {
-                // Quet source/dependency tren filesystem truoc khi build image
-                sh 'trivy fs --severity HIGH,CRITICAL --exit-code 0 --format table -o trivy-fs-report.txt .'
-            }
-            post {
-                always { archiveArtifacts artifacts: 'trivy-fs-report.txt', allowEmptyArchive: true }
-            }
-        }
+//         stage('Trivy FS Scan') {
+//             steps {
+//                 // Quet source/dependency tren filesystem truoc khi build image
+//                 sh 'trivy fs --severity HIGH,CRITICAL --exit-code 0 --format table -o trivy-fs-report.txt .'
+//             }
+//             post {
+//                 always { archiveArtifacts artifacts: 'trivy-fs-report.txt', allowEmptyArchive: true }
+//             }
+//         }
 
         // ---- Buoc 7: Docker build & push (icon Docker trong anh) ----
         stage('Docker Build & Push') {
@@ -107,15 +107,15 @@ pipeline {
                     docker.withRegistry('https://index.docker.io/v1/', "${REGISTRY_CRED}") {
                         def img = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
                         // Quet chinh image vua build (Trivy image scan)
-                        sh "trivy image --severity HIGH,CRITICAL --exit-code 0 -o trivy-image-report.txt ${IMAGE_NAME}:${IMAGE_TAG}"
+                        //sh "trivy image --severity HIGH,CRITICAL --exit-code 0 -o trivy-image-report.txt ${IMAGE_NAME}:${IMAGE_TAG}"
                         img.push()
                         img.push('latest')
                     }
                 }
             }
-            post {
-                always { archiveArtifacts artifacts: 'trivy-image-report.txt', allowEmptyArchive: true }
-            }
+//             post {
+//                 always { archiveArtifacts artifacts: 'trivy-image-report.txt', allowEmptyArchive: true }
+//             }
         }
 
         // ---- Buoc 8: Trigger CD Job (mui ten "Trigger Jenkins CD Job") ----
@@ -128,17 +128,17 @@ pipeline {
         }
     }
 
-    post {
-        // ---- Notify on email (icon Gmail trong anh) ----
-        success {
-            emailext subject: "CI OK: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                     body: "CI thanh cong. Image: ${IMAGE_NAME}:${IMAGE_TAG}",
-                     to: 'vietxuyen97@gmail.com'
-        }
-        failure {
-            emailext subject: "CI FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                     body: "CI that bai. Xem: ${env.BUILD_URL}",
-                     to: 'vietxuyen97@gmail.com'
-        }
-    }
+//     post {
+//         // ---- Notify on email (icon Gmail trong anh) ----
+//         success {
+//             emailext subject: "CI OK: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+//                      body: "CI thanh cong. Image: ${IMAGE_NAME}:${IMAGE_TAG}",
+//                      to: 'vietxuyen97@gmail.com'
+//         }
+//         failure {
+//             emailext subject: "CI FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+//                      body: "CI that bai. Xem: ${env.BUILD_URL}",
+//                      to: 'vietxuyen97@gmail.com'
+//         }
+//     }
 }

@@ -10,7 +10,10 @@
 services:
 
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    build:
+      context: .
+      dockerfile: jenkins/Dockerfile   # image Jenkins co san Docker CLI + Trivy
+    image: jenkins-cicd:lts
     container_name: jenkins
     user: root
     ports:
