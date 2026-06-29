@@ -17,7 +17,7 @@ pipeline {
     environment {
         IMAGE_NAME  = 'vietng1997/cicd-demo'
         GIT_CRED    = 'github-cred'   // Jenkins credentials ID (token GitHub)
-        MANIFEST_REPO = 'https://github.com/fancoooo/test_cicd.git'
+        MANIFEST_REPO = 'github.com/fancoooo/test_cicd.git'   // KHONG co https:// (code se tu them)
     }
 
     stages {
@@ -25,7 +25,7 @@ pipeline {
         // ---- Pull code (repo chua manifest k8s) ----
         stage('Pull Manifest Repo') {
             steps {
-                git branch: 'main', url: "https://${MANIFEST_REPO}"
+                git branch: 'master', url: "https://${MANIFEST_REPO}", credentialsId: "${GIT_CRED}"
             }
         }
 
@@ -50,7 +50,7 @@ pipeline {
                         git config user.name  "jenkins-cd"
                         git add k8s/deployment.yaml
                         git commit -m "chore: update image to ${IMAGE_TAG} [ci skip]" || echo "Khong co thay doi"
-                        git push https://${GIT_USER}:${GIT_TOKEN}@${MANIFEST_REPO} HEAD:main
+                        git push https://${GIT_USER}:${GIT_TOKEN}@${MANIFEST_REPO} HEAD:master
                     '''
                 }
             }
