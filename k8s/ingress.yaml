@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cicd-demo
+  namespace: cicd-demo
+spec:
+  ingressClassName: nginx          # dung ingress-nginx san co trong cluster
+  rules:
+    # nip.io tu phan giai host nay ve IP public cua node (192.223.15.194).
+    # Truy cap qua NodePort http: http://cicd-demo.192.223.15.194.nip.io:31512/
+    - host: cicd-demo.192.223.15.194.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cicd-demo
+                port:
+                  number: 80
